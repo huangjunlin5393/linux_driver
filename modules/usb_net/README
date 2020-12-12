@@ -1,0 +1,51 @@
+对于xin100.c和ttyxin.c:
+
+1.增加驱动文件放到drivers/net/usb/目录下
+
+2.驱动可编译进内核，或系统启动时通过脚本加载驱动；网卡驱动需要依赖于linux系统usbnet.ko和cdc_ether.ko两个模块
+
+驱动加载后当设备插入会生成1个网卡和三个串口 如下：
+
+     串口：ttyVCOM1110 ttyVCOM1111 ttyVCOM1112
+     网卡:lte0
+     
+     第一个串口ttyVCOM0用于AT命令的收发
+     第二个串口ttyVCOM1用于后续的版本升级;
+     第三个串口ttyVCOM2用于后续的LOG处理;     
+3、串口编程注意事项：
+   当打开ttyVCOM0后，不需要设置相关的参数(类似tcsetattr等配置函数需要删除)，直接read和write 描述符就可以。
+4.Kconfig文件添加：
+config USB_XIN100_NET
+        tristate "USB Ethernet driver for Xincomm LTE modems"
+        depends on USB_USBNET
+        select USB_NET_CDCETHER
+        help
+          choose this option if you have a Xincomm Wireless USB Ehternet device.
+          To compile this driver as a module, choose M here:the module will be called xin100.
+
+config USB_XINTTY
+        tristate "Xin100 USB TTY support"
+    depends on USB
+    ---help---
+      This driver supports the Xin100 HID interface Management.
+
+      To compile this driver as a module, choose M here: the
+      module will be called ttyxin.
+
+3. Makefile文件添加：
+obj-$(CONFIG_USB_XIN100_NET)  += xin100.o
+obj-$(CONFIG_USB_XINTTY)        += ttyxin.o
+
+4. ueventd配置文件增加相关的权限配置：(以实际虚拟出的串口名为准)
+/dev/ttyVCOM0             0666   system     radio
+/dev/ttyVCOM1             0666   system     radio
+
+5.init.rc文件添加
+service dhcpcd_lte0 /system/bin/dhcpcd -ABKL
+    class main
+    disabled
+    oneshot
+service iprenew_lte0 /system/bin/dhcpcd -n
+    class main
+    disabled
+    oneshot
