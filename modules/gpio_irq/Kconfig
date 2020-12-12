@@ -1,0 +1,14 @@
+menuconfig IRQ_SUPPORT
+	bool "irq support"
+	help
+	  Say Y here to enable irq support. This allows irq driver that for
+	  quick interrupt request come from fpga. That adds up four interrupts.	  
+
+if IRQ_SUPPORT
+
+config IRQ_FPGA
+	tristate "irq fpga support"
+	help
+	  Say Y here to enable irq support come from fpga and drivers.
+
+endif
