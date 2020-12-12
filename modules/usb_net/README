@@ -32,15 +32,15 @@ config USB_XINTTY
       To compile this driver as a module, choose M here: the
       module will be called ttyxin.
 
-3. Makefile文件添加：
+4.1. Makefile文件添加：
 obj-$(CONFIG_USB_XIN100_NET)  += xin100.o
 obj-$(CONFIG_USB_XINTTY)        += ttyxin.o
 
-4. ueventd配置文件增加相关的权限配置：(以实际虚拟出的串口名为准)
+4.2. ueventd配置文件增加相关的权限配置：(以实际虚拟出的串口名为准)
 /dev/ttyVCOM0             0666   system     radio
 /dev/ttyVCOM1             0666   system     radio
 
-5.init.rc文件添加
+4.3.init.rc文件添加
 service dhcpcd_lte0 /system/bin/dhcpcd -ABKL
     class main
     disabled
